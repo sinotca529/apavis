@@ -1,0 +1,24 @@
+@media all and (min-width: 500px) {
+  .columns {
+    display: flex;
+  }
+}
+
+body {
+  font-size: xx-large;
+}
+
+.column {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  /* align-items: flex-end; */
+  justify-content: center;
+}
+
+textarea {
+  /* display: inline-block; */
+  width: 100%;
+  padding: 0.5em:
+  margin: 0.5em 0;
+}
