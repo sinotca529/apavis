@@ -67,13 +67,35 @@ class CyGraph {
           },
         },
         {
-          selector: "edge",
+          selector: `edge[label = ${COPY}]`,
           style: {
             width: 3,
             "line-color": "#ccc",
             "target-arrow-color": "#ccc",
             "curve-style": "bezier",
             "target-arrow-shape": "triangle",
+          },
+        },
+        {
+          selector: `edge[label = ${LOAD}]`,
+          style: {
+            width: 3,
+            "line-color": "#a0c",
+            "target-arrow-color": "#a0c",
+            "source-arrow-color": "#a0c",
+            "curve-style": "bezier",
+            "target-arrow-shape": "triangle",
+            "source-arrow-shape": "circle",
+          },
+        },
+        {
+          selector: `edge[label = ${STORE}]`,
+          style: {
+            width: 3,
+            "line-color": "#00c",
+            "target-arrow-color": "#00c",
+            "curve-style": "bezier",
+            "target-arrow-shape": "circle-triangle",
           },
         },
       ],
@@ -97,7 +119,7 @@ class CyGraph {
     this.cy.add([{ data: { id: symbol } }]);
   }
 
-  add_edge(dst, src) {
+  add_edge(dst, src, type) {
     console.log(dst, src);
     this.#add_node(dst);
     this.#add_node(src);
@@ -107,6 +129,7 @@ class CyGraph {
           id: src + "#" + dst,
           source: src,
           target: dst,
+          label: type,
         },
       },
     ]);
@@ -139,19 +162,19 @@ class Graph {
   }
 
   add_copy_edge(dst, src) {
-    console.log(dst, src);
     const updated = this.#add_edge(this.copy_edges, dst, src);
-    console.log(dst, src);
-    this.cy.add_edge(dst, src);
+    this.cy.add_edge(dst, src, COPY);
     return updated;
   }
 
   add_load_edge(dst, src) {
     this.#add_edge(this.load_edges, dst, src);
+    this.cy.add_edge(dst, src, LOAD);
   }
 
   add_store_edge(dst, src) {
     this.#add_edge(this.store_edges, dst, src);
+    this.cy.add_edge(dst, src, STORE);
   }
 
   add_pointee(pointer, pointee) {
