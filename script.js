@@ -44,13 +44,8 @@ class Node {
   }
 }
 
-class Graph {
+class CyGraph {
   constructor() {
-    this.copy_edges = new Map();
-    this.store_edges = new Map();
-    this.load_edges = new Map();
-    this.pointees = new Map();
-
     this.cy = cytoscape({
       container: document.getElementById("graph"),
       style: [
@@ -83,21 +78,21 @@ class Graph {
     });
   }
 
-  cy_add_node(symbol) {
+  add_node(symbol) {
     this.cy.add([{ data: { id: symbol } }]);
   }
 
-  cy_set_pointee(symbol, pointee) {
-    this.cy_add_node(symbol);
+  set_pointee(symbol, pointee) {
+    this.add_node(symbol);
     var node = this.cy.$id(symbol);
     node.data("pointee", pointee);
-    this.cy_reset_layout();
+    this.reset_layout();
   }
 
-  cy_add_edge(dst, src) {
+  add_edge(dst, src) {
     console.log(dst, src);
-    this.cy_add_node(dst);
-    this.cy_add_node(src);
+    this.add_node(dst);
+    this.add_node(src);
     this.cy.add([
       {
         data: {
@@ -107,16 +102,26 @@ class Graph {
         },
       },
     ]);
-    this.cy_reset_layout();
+    this.reset_layout();
   }
 
-  cy_reset_layout() {
+  reset_layout() {
     var layout = this.cy.layout({
       name: "cose",
       fit: true,
       padding: 30,
     });
     layout.run();
+  }
+}
+
+class Graph {
+  constructor() {
+    this.copy_edges = new Map();
+    this.store_edges = new Map();
+    this.load_edges = new Map();
+    this.pointees = new Map();
+    this.cy = new CyGraph();
   }
 
   add_edge(map, dst, src) {
@@ -131,7 +136,7 @@ class Graph {
     console.log(dst, src);
     const updated = this.add_edge(this.copy_edges, dst, src);
     console.log(dst, src);
-    this.cy_add_edge(dst, src);
+    this.cy.add_edge(dst, src);
     return updated;
   }
 
@@ -146,7 +151,7 @@ class Graph {
   add_pointee(pointer, pointee) {
     this.add_edge(this.pointees, pointee, pointer);
     const pointees = Array.from(this.pointees.get(pointer)).join(" ");
-    this.cy_set_pointee(pointer, pointees);
+    this.cy.set_pointee(pointer, pointees);
   }
 }
 
