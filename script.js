@@ -1,3 +1,8 @@
+const LOAD    = 0;
+const COPY    = 1;
+const STORE   = 2;
+const ADDR_OF = 3;
+
 class Inst {
   constructor(type, lhs_symbol, rhs_symbol) {
     this.type = type;
@@ -24,11 +29,11 @@ function parse(code) {
       return;
     }
 
-    if (lhs[0] == "*") insts.push(new Inst("store", lhs.substring(1), rhs));
-    else if (rhs[0] == "*") insts.push(new Inst("load", lhs, rhs.substring(1)));
+    if (lhs[0] == "*") insts.push(new Inst(STORE, lhs.substring(1), rhs));
+    else if (rhs[0] == "*") insts.push(new Inst(LOAD, lhs, rhs.substring(1)));
     else if (rhs[0] == "&")
-      insts.push(new Inst("addr_of", lhs, rhs.substring(1)));
-    else insts.push(new Inst("copy", lhs, rhs));
+      insts.push(new Inst(ADDR_OF, lhs, rhs.substring(1)));
+    else insts.push(new Inst(COPY, lhs, rhs));
   });
 
   return insts;
@@ -166,19 +171,19 @@ function apa(code) {
   // Collect constraints
   insts.forEach((i) => {
     switch (i.type) {
-      case "copy":
+      case COPY:
         console.log("copy", i.lhs, i.rhs);
         g.add_copy_edge(i.lhs, i.rhs);
         break;
-      case "addr_of":
+      case ADDR_OF:
         console.log("addr_of");
         g.add_pointee(i.lhs, i.rhs);
         break;
-      case "load":
+      case LOAD:
         console.log("load");
         g.add_load_edge(i.lhs, i.rhs);
         break;
-      case "store":
+      case STORE:
         console.log("store");
         g.add_store_edge(i.lhs, i.rhs);
         break;
