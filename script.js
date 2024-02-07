@@ -13,6 +13,7 @@ function parse(code) {
   const insts = [];
   lines.forEach((line) => {
     if (line == "") return;
+    // TODO: extract as Inst.parse
     const exprs = line.split("=");
     const lhs = exprs[0];
     const rhs = exprs[1];
@@ -54,7 +55,7 @@ class CyGraph {
           style: {
             "background-color": "#666",
             label: (node) => {
-              var p = node.data("pointee");
+              var p = node.data("pointees");
               if (p == undefined) p = "";
               return `${node.data("id")} -> {${p}}`;
             },
@@ -78,21 +79,23 @@ class CyGraph {
     });
   }
 
-  add_node(symbol) {
-    this.cy.add([{ data: { id: symbol } }]);
+  #reset_layout() {
+    var layout = this.cy.layout({
+      name: "cose",
+      fit: true,
+      padding: 30,
+    });
+    layout.run();
   }
 
-  set_pointee(symbol, pointee) {
-    this.add_node(symbol);
-    var node = this.cy.$id(symbol);
-    node.data("pointee", pointee);
-    this.reset_layout();
+  #add_node(symbol) {
+    this.cy.add([{ data: { id: symbol } }]);
   }
 
   add_edge(dst, src) {
     console.log(dst, src);
-    this.add_node(dst);
-    this.add_node(src);
+    this.#add_node(dst);
+    this.#add_node(src);
     this.cy.add([
       {
         data: {
@@ -102,16 +105,14 @@ class CyGraph {
         },
       },
     ]);
-    this.reset_layout();
+    this.#reset_layout();
   }
 
-  reset_layout() {
-    var layout = this.cy.layout({
-      name: "cose",
-      fit: true,
-      padding: 30,
-    });
-    layout.run();
+  set_pointees(symbol, pointees) {
+    this.#add_node(symbol);
+    var node = this.cy.$id(symbol);
+    node.data("pointees", pointees);
+    this.#reset_layout();
   }
 }
 
@@ -124,7 +125,7 @@ class Graph {
     this.cy = new CyGraph();
   }
 
-  add_edge(map, dst, src) {
+  #add_edge(map, dst, src) {
     if (!map.has(src)) map.set(src, new Set());
     const before_size = map.get(src).size;
     map.get(src).add(dst);
@@ -134,24 +135,24 @@ class Graph {
 
   add_copy_edge(dst, src) {
     console.log(dst, src);
-    const updated = this.add_edge(this.copy_edges, dst, src);
+    const updated = this.#add_edge(this.copy_edges, dst, src);
     console.log(dst, src);
     this.cy.add_edge(dst, src);
     return updated;
   }
 
   add_load_edge(dst, src) {
-    this.add_edge(this.load_edges, dst, src);
+    this.#add_edge(this.load_edges, dst, src);
   }
 
   add_store_edge(dst, src) {
-    this.add_edge(this.store_edges, dst, src);
+    this.#add_edge(this.store_edges, dst, src);
   }
 
   add_pointee(pointer, pointee) {
-    this.add_edge(this.pointees, pointee, pointer);
+    this.#add_edge(this.pointees, pointee, pointer);
     const pointees = Array.from(this.pointees.get(pointer)).join(" ");
-    this.cy.set_pointee(pointer, pointees);
+    this.cy.set_pointees(pointer, pointees);
   }
 }
 
