@@ -148,7 +148,7 @@ class Graph {
     this.copy_edges = new Map();
     this.store_edges = new Map();
     this.load_edges = new Map();
-    this.pointees = new Map();
+    this.points_to_edges = new Map();
     this.cy = new CyGraph();
   }
 
@@ -160,24 +160,24 @@ class Graph {
     return after_size > before_size;
   }
 
-  add_copy_edge(dst, src) {
+  eval_copy_edge(dst, src) {
     const updated = this.#add_edge(this.copy_edges, dst, src);
     this.cy.add_edge(dst, src, COPY);
     return updated;
   }
 
-  add_load_edge(dst, src) {
+  eval_load_edge(dst, src) {
     this.#add_edge(this.load_edges, dst, src);
     this.cy.add_edge(dst, src, LOAD);
   }
 
-  add_store_edge(dst, src) {
+  eval_store_edge(dst, src) {
     this.#add_edge(this.store_edges, dst, src);
     this.cy.add_edge(dst, src, STORE);
   }
 
-  add_pointee(pointer, pointee) {
-    this.#add_edge(this.pointees, pointee, pointer);
+  eval_points_to_edge(pointer, pointee) {
+    this.#add_edge(this.points_to_edges, pointee, pointer);
     this.cy.add_edge(pointee, pointer, ADDR_OF);
   }
 }
@@ -194,19 +194,19 @@ function apa(code) {
     switch (i.type) {
       case COPY:
         console.log("copy", i.lhs, i.rhs);
-        g.add_copy_edge(i.lhs, i.rhs);
+        g.eval_copy_edge(i.lhs, i.rhs);
         break;
       case ADDR_OF:
         console.log("addr_of");
-        g.add_pointee(i.lhs, i.rhs);
+        g.eval_points_to_edge(i.lhs, i.rhs);
         break;
       case LOAD:
         console.log("load");
-        g.add_load_edge(i.lhs, i.rhs);
+        g.eval_load_edge(i.lhs, i.rhs);
         break;
       case STORE:
         console.log("store");
-        g.add_store_edge(i.lhs, i.rhs);
+        g.eval_store_edge(i.lhs, i.rhs);
         break;
     }
   });
