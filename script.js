@@ -113,7 +113,7 @@ class CyGraph {
   }
 
   #reset_layout() {
-    var layout = this.cy.layout({
+    const layout = this.cy.layout({
       name: "cose",
       fit: true,
       padding: 30,
@@ -177,6 +177,7 @@ class Graph {
 
   eval_copy_edge(dst, src) {
     let updated = this.#add_edge(this.copy_edges, dst, src);
+    console.log(dst, src);
     this.cy.add_edge(dst, src, COPY);
     updated |= this.#copy_pointees(dst, src);
     return updated;
@@ -192,7 +193,7 @@ class Graph {
   }
 
   eval_store_edge(dst, src) {
-    const updated = this.#add_edge(this.store_edges, dst, src);
+    let updated = this.#add_edge(this.store_edges, dst, src);
     this.cy.add_edge(dst, src, STORE);
     this.points_to_edges.get(dst).forEach((derefed) => {
       updated |= this.#copy_pointees(derefed, src);
@@ -207,42 +208,54 @@ class Graph {
   }
 }
 
-function apa(code) {
-  const insts = parse(code);
-  const g = new Graph();
+class Apa {
+  constructor(code) {
+    this.g = new Graph();
+    this.insts = parse(code);
+    this.next_index = 0;
+  }
 
-  // worklist
-  const stack = [];
-
-  // Collect constraints
-  insts.forEach((i) => {
-    switch (i.type) {
+  eval(inst) {
+    switch (inst.type) {
       case COPY:
-        console.log("copy", i.lhs, i.rhs);
-        g.eval_copy_edge(i.lhs, i.rhs);
-        break;
+        return this.g.eval_copy_edge(inst.lhs, inst.rhs);
       case ADDR_OF:
-        console.log("addr_of");
-        g.eval_points_to_edge(i.lhs, i.rhs);
-        break;
+        return this.g.eval_points_to_edge(inst.lhs, inst.rhs);
       case LOAD:
-        console.log("load");
-        g.eval_load_edge(i.lhs, i.rhs);
-        break;
+        return this.g.eval_load_edge(inst.lhs, inst.rhs);
       case STORE:
-        console.log("store");
-        g.eval_store_edge(i.lhs, i.rhs);
-        break;
+        return this.g.eval_store_edge(inst.lhs, inst.rhs);
     }
-  });
+  }
 
-  // TODO: Analysis
+  num_insts() {
+    return this.insts.length;
+  }
+
+  step() {
+    const inst = this.insts[this.next_index];
+    this.next_index = (this.next_index + 1) % this.insts.length;
+    return this.eval(inst);
+  }
+}
+
+function do_apa() {
+  const code = document.getElementById("code").value;
+  const apa = new Apa(code);
+  const num_insts = apa.num_insts();
+
+  let updated = true;
+  while (updated) {
+    updated = false;
+    for (i = 0; i < num_insts; ++i) {
+      updated |= apa.step();
+    }
+  }
 }
 
 function main() {
   document.getElementById("start").addEventListener("click", () => {
-    var code = document.getElementById("code").value;
-    apa(code);
+    do_apa();
   });
 }
 
