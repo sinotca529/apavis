@@ -154,31 +154,56 @@ class Graph {
 
   #add_edge(map, dst, src) {
     if (!map.has(src)) map.set(src, new Set());
+    if (!map.has(dst)) map.set(dst, new Set());
     const before_size = map.get(src).size;
     map.get(src).add(dst);
     const after_size = map.get(src).size;
     return after_size > before_size;
   }
 
+  #copy_pointees(dst, src) {
+    if (!this.points_to_edges.has(src))
+      this.points_to_edges.set(src, new Set());
+    if (!this.points_to_edges.has(dst))
+      this.points_to_edges.set(dst, new Set());
+
+    let updated = false;
+    this.points_to_edges.get(src).forEach((pointee) => {
+      updated |= this.#add_edge(this.points_to_edges, pointee, dst);
+      this.cy.add_edge(pointee, dst, ADDR_OF);
+    });
+    return updated;
+  }
+
   eval_copy_edge(dst, src) {
-    const updated = this.#add_edge(this.copy_edges, dst, src);
+    let updated = this.#add_edge(this.copy_edges, dst, src);
     this.cy.add_edge(dst, src, COPY);
+    updated |= this.#copy_pointees(dst, src);
     return updated;
   }
 
   eval_load_edge(dst, src) {
-    this.#add_edge(this.load_edges, dst, src);
+    let updated = this.#add_edge(this.load_edges, dst, src);
     this.cy.add_edge(dst, src, LOAD);
+    this.points_to_edges.get(src).forEach((derefed) => {
+      updated |= this.#copy_pointees(dst, derefed);
+    });
+    return updated;
   }
 
   eval_store_edge(dst, src) {
-    this.#add_edge(this.store_edges, dst, src);
+    const updated = this.#add_edge(this.store_edges, dst, src);
     this.cy.add_edge(dst, src, STORE);
+    this.points_to_edges.get(dst).forEach((derefed) => {
+      updated |= this.#copy_pointees(derefed, src);
+    });
+    return updated;
   }
 
   eval_points_to_edge(pointer, pointee) {
-    this.#add_edge(this.points_to_edges, pointee, pointer);
+    let updated = this.#add_edge(this.points_to_edges, pointee, pointer);
     this.cy.add_edge(pointee, pointer, ADDR_OF);
+    return updated;
   }
 }
 
