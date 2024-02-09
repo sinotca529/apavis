@@ -9,6 +9,22 @@ class Inst {
     this.lhs = lhs_symbol;
     this.rhs = rhs_symbol;
   }
+
+  static parse(line) {
+    const exprs = line.split("=");
+    const lhs = exprs[0];
+    const rhs = exprs[1];
+
+    if ((rhs[0] == "*" && lhs[0] == "*") || lhs[0] == "&") {
+      window.alert("parse error");
+      return;
+    }
+
+    if (lhs[0] == "*") return new Inst(STORE, lhs.substring(1), rhs);
+    else if (rhs[0] == "*") return new Inst(LOAD, lhs, rhs.substring(1));
+    else if (rhs[0] == "&") return new Inst(ADDR_OF, lhs, rhs.substring(1));
+    else return new Inst(COPY, lhs, rhs);
+  }
 }
 
 function parse(code) {
@@ -16,26 +32,7 @@ function parse(code) {
   const lines = code.split("\n");
 
   const insts = [];
-  lines.forEach((line) => {
-    if (line == "") return;
-    // TODO: extract as Inst.parse
-    const exprs = line.split("=");
-    const lhs = exprs[0];
-    const rhs = exprs[1];
-
-    const type = "";
-    if ((rhs[0] == "*" && lhs[0] == "*") || lhs[0] == "&") {
-      window.alert("parse error");
-      return;
-    }
-
-    if (lhs[0] == "*") insts.push(new Inst(STORE, lhs.substring(1), rhs));
-    else if (rhs[0] == "*") insts.push(new Inst(LOAD, lhs, rhs.substring(1)));
-    else if (rhs[0] == "&")
-      insts.push(new Inst(ADDR_OF, lhs, rhs.substring(1)));
-    else insts.push(new Inst(COPY, lhs, rhs));
-  });
-
+  lines.filter((l) => l != "").forEach((l) => insts.push(Inst.parse(l)));
   return insts;
 }
 
