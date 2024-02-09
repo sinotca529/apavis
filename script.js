@@ -1,6 +1,6 @@
-const LOAD    = 0;
-const COPY    = 1;
-const STORE   = 2;
+const LOAD = 0;
+const COPY = 1;
+const STORE = 2;
 const ADDR_OF = 3;
 
 class Inst {
@@ -58,12 +58,10 @@ class CyGraph {
         {
           selector: "node",
           style: {
-            "background-color": "#666",
-            label: (node) => {
-              var p = node.data("pointees");
-              if (p == undefined) p = "";
-              return `${node.data("id")} -> {${p}}`;
-            },
+            "background-color": "#fff",
+            label: "data(id)",
+            "text-valign": "center",
+            "text-halign": "center",
           },
         },
         {
@@ -96,6 +94,17 @@ class CyGraph {
             "target-arrow-color": "#00c",
             "curve-style": "bezier",
             "target-arrow-shape": "circle-triangle",
+          },
+        },
+        {
+          selector: `edge[label = ${ADDR_OF}]`,
+          style: {
+            width: 1,
+            "line-color": "#000",
+            "target-arrow-color": "#000",
+            "curve-style": "bezier",
+            "target-arrow-shape": "triangle",
+            "line-style": "dashed",
           },
         },
       ],
@@ -135,13 +144,6 @@ class CyGraph {
     ]);
     this.#reset_layout();
   }
-
-  set_pointees(symbol, pointees) {
-    this.#add_node(symbol);
-    var node = this.cy.$id(symbol);
-    node.data("pointees", pointees);
-    this.#reset_layout();
-  }
 }
 
 class Graph {
@@ -179,8 +181,7 @@ class Graph {
 
   add_pointee(pointer, pointee) {
     this.#add_edge(this.pointees, pointee, pointer);
-    const pointees = Array.from(this.pointees.get(pointer)).join(" ");
-    this.cy.set_pointees(pointer, pointees);
+    this.cy.add_edge(pointee, pointer, ADDR_OF);
   }
 }
 
