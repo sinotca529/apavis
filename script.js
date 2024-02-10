@@ -217,9 +217,12 @@ class Apa {
     this.g = new Graph();
     this.insts = parse(code);
     this.next_index = 0;
+
+    this.updated = false;
+    this.finish = false;
   }
 
-  eval(inst) {
+  #eval(inst) {
     switch (inst.type) {
       case COPY:
         return this.g.eval_copy_edge(inst.lhs, inst.rhs);
@@ -232,32 +235,28 @@ class Apa {
     }
   }
 
-  num_insts() {
-    return this.insts.length;
+  is_finish() {
+    return this.finish;
   }
 
-  next_inst() {
-    return this.insts[this.next_index];
+  next_inst_ln() {
+    return this.insts[this.next_index].ln;
   }
 
   step() {
     const inst = this.insts[this.next_index];
     this.next_index = (this.next_index + 1) % this.insts.length;
-    return this.eval(inst);
-  }
-}
+    const updated = this.#eval(inst);
+    this.updated |= updated;
 
-function do_apa() {
-  const code = document.getElementById("code").innerText;
-  const apa = new Apa(code);
-  const num_insts = apa.num_insts();
-
-  let updated = true;
-  while (updated) {
-    updated = false;
-    for (i = 0; i < num_insts; ++i) {
-      updated |= apa.step();
+    if (this.next_index == 0) {
+      if (this.updated == false) {
+        this.finish = true;
+      } else {
+        this.updated = false;
+      }
     }
+    return updated;
   }
 }
 
@@ -277,18 +276,27 @@ function mark_line(ln_to_mark) {
   document.getElementById("code").innerHTML = marked_code;
 }
 
+function unmark() {
+  document.getElementById("code").innerHTML =
+    document.getElementById("code").innerText;
+}
+
 var apa = undefined;
 function reset_apa() {
   const code = document.getElementById("code").innerText;
   apa = new Apa(code);
+  document.getElementById("next").disabled = false;
+  unmark();
 }
 
 function main() {
   document.getElementById("next").addEventListener("click", () => {
     if (apa == undefined) reset_apa();
-    const ln = apa.next_inst().ln;
-    console.log(apa.next_inst());
-    mark_line(ln);
+    if (apa.is_finish()) {
+      document.getElementById("next").disabled = true;
+      return;
+    }
+    mark_line(apa.next_inst_ln());
     apa.step();
   });
 
