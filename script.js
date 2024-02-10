@@ -52,7 +52,8 @@ class Node {
 }
 
 class CyGraph {
-  constructor() {
+  constructor(grid_size) {
+    this.grid_size = grid_size;
     this.cy = cytoscape({
       container: document.getElementById("graph"),
       style: [
@@ -111,16 +112,19 @@ class CyGraph {
       ],
       layout: {
         name: "grid",
-        rows: 1,
+        rows: grid_size,
+        cols: grid_size,
       },
     });
   }
 
   #reset_layout() {
     const layout = this.cy.layout({
-      name: "cose",
+      name: "grid",
       fit: true,
       padding: 30,
+      rows: this.grid_size,
+      cols: this.grid_size,
     });
     layout.run();
   }
@@ -148,12 +152,12 @@ class CyGraph {
 }
 
 class Graph {
-  constructor() {
+  constructor(grid_size) {
     this.copy_edges = new Map();
     this.store_edges = new Map();
     this.load_edges = new Map();
     this.points_to_edges = new Map();
-    this.cy = new CyGraph();
+    this.cy = new CyGraph(grid_size);
   }
 
   #add_edge(map, dst, src) {
@@ -212,10 +216,25 @@ class Graph {
   }
 }
 
+function num_symbols(insts) {
+  let symbol_set = new Set();
+  insts.forEach((i) => {
+    symbol_set.add(i.lhs);
+    symbol_set.add(i.rhs);
+  });
+  return symbol_set.size;
+}
+
 class Apa {
   constructor(code) {
-    this.g = new Graph();
     this.insts = parse(code);
+
+    const ns = num_symbols(this.insts);
+    console.log(ns);
+    const grid_size = Math.ceil(Math.sqrt(ns));
+    console.log(grid_size);
+
+    this.g = new Graph(grid_size);
     this.next_index = 0;
 
     this.updated = false;
