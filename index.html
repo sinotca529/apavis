@@ -11,54 +11,57 @@
     <div class="columns">
       <div class="column">
         <pre contenteditable="True" id="code" name="code"></pre>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Kind</th>
+              <th scope="col">Syntax</th>
+              <th scope="col">Edge</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">COPY</th>
+              <td><pre>p = q</pre></td>
+              <td><pre>p &lt;----- q</pre></td>
+            </tr>
+            <tr>
+              <th scope="row">LOAD</th>
+              <td><pre>p = *q</pre></td>
+              <td><pre>p &lt;-----o q</pre></td>
+            </tr>
+            <tr>
+              <th scope="row">STORE</th>
+              <td><pre>*p = q</pre></td>
+              <td><pre>p o&lt;----- q</pre></td>
+            </tr>
+            <tr>
+              <th scope="row">ADDR_OF</th>
+              <td><pre>p = &a</pre></td>
+              <td><pre>p - - -&gt; a</pre></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div class="column">
-        <div class="graph" id="graph" style="width: 100%"></div>
+        <div class="graph" id="graph"></div>
         <div class="columns">
           <div class="column">
             <button type="button" id="reset">Reset</button>
           </div>
           <div class="column">
-            <button disabled type="button" id="before">&lt;</button>
-          </div>
-          <div class="column">
             <button type="button" id="next">&gt;</button>
           </div>
         </div>
+        <div style="margin:1em">
+          Usage:
+          <ol>
+            <li>Write code</li>
+            <li>Click '&gt;' button to step analyze.</li>
+          </ol>
+        </div>
       </div>
     </div>
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Kind</th>
-            <th scope="col">Syntax</th>
-            <th scope="col">Edge</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">COPY</th>
-            <td><pre>p = q</pre></td>
-            <td><pre>p &lt;----- q</pre></td>
-          </tr>
-          <tr>
-            <th scope="row">LOAD</th>
-            <td><pre>p = *q</pre></td>
-            <td><pre>p &lt;-----o q</pre></td>
-          </tr>
-          <tr>
-            <th scope="row">STORE</th>
-            <td><pre>*p = q</pre></td>
-            <td><pre>p o&lt;----- q</pre></td>
-          </tr>
-          <tr>
-            <th scope="row">ADDR_OF</th>
-            <td><pre>p = &a</pre></td>
-            <td><pre>p - - -&gt; a</pre></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <div></div>
   </body>
 </html>
