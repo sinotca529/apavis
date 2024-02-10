@@ -13,6 +13,7 @@ class Inst {
 
   static parse(line, ln) {
     const exprs = line.split("=");
+    if (exprs.length != 2) window.alert("parse error");
     const lhs = exprs[0];
     const rhs = exprs[1];
 
