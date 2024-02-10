@@ -256,10 +256,12 @@ class Apa {
   }
 
   next_inst_ln() {
+    if (this.insts.length == 0) return 0;
     return this.insts[this.next_index].ln;
   }
 
   step() {
+    if (this.insts.length == 0) return;
     const inst = this.insts[this.next_index];
     this.next_index = (this.next_index + 1) % this.insts.length;
     const updated = this.#eval(inst);
