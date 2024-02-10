@@ -4,13 +4,14 @@ const STORE = 2;
 const ADDR_OF = 3;
 
 class Inst {
-  constructor(type, lhs_symbol, rhs_symbol) {
+  constructor(type, lhs_symbol, rhs_symbol, ln) {
     this.type = type;
     this.lhs = lhs_symbol;
     this.rhs = rhs_symbol;
+    this.ln = ln;
   }
 
-  static parse(line) {
+  static parse(line, ln) {
     const exprs = line.split("=");
     const lhs = exprs[0];
     const rhs = exprs[1];
@@ -20,10 +21,10 @@ class Inst {
       return;
     }
 
-    if (lhs[0] == "*") return new Inst(STORE, lhs.substring(1), rhs);
-    else if (rhs[0] == "*") return new Inst(LOAD, lhs, rhs.substring(1));
-    else if (rhs[0] == "&") return new Inst(ADDR_OF, lhs, rhs.substring(1));
-    else return new Inst(COPY, lhs, rhs);
+    if (lhs[0] == "*") return new Inst(STORE, lhs.substring(1), rhs, ln);
+    else if (rhs[0] == "*") return new Inst(LOAD, lhs, rhs.substring(1), ln);
+    else if (rhs[0] == "&") return new Inst(ADDR_OF, lhs, rhs.substring(1), ln);
+    else return new Inst(COPY, lhs, rhs, ln);
   }
 }
 
@@ -32,7 +33,10 @@ function parse(code) {
   const lines = code.split("\n");
 
   const insts = [];
-  lines.filter((l) => l != "").forEach((l) => insts.push(Inst.parse(l)));
+  lines.forEach((l, ln) => {
+    if (l.length == 0) return;
+    insts.push(Inst.parse(l, ln));
+  });
   return insts;
 }
 
@@ -232,6 +236,10 @@ class Apa {
     return this.insts.length;
   }
 
+  next_inst() {
+    return this.insts[this.next_index];
+  }
+
   step() {
     const inst = this.insts[this.next_index];
     this.next_index = (this.next_index + 1) % this.insts.length;
@@ -240,7 +248,7 @@ class Apa {
 }
 
 function do_apa() {
-  const code = document.getElementById("code").value;
+  const code = document.getElementById("code").innerText;
   const apa = new Apa(code);
   const num_insts = apa.num_insts();
 
@@ -253,12 +261,42 @@ function do_apa() {
   }
 }
 
+function mark_line(ln_to_mark) {
+  const code = document.getElementById("code").innerText;
+  let marked_code = code
+    .split("\n")
+    .map((l, ln) => {
+      if (ln == ln_to_mark) return "<mark>" + l + "</mark>";
+      return l;
+    })
+    .reduce((acc, e) => {
+      return acc + "\n" + e;
+    });
+  if (marked_code == undefined) marked_code = "";
+
+  document.getElementById("code").innerHTML = marked_code;
+}
+
+var apa = undefined;
+function reset_apa() {
+  const code = document.getElementById("code").innerText;
+  apa = new Apa(code);
+}
+
 function main() {
-  document.getElementById("start").addEventListener("click", () => {
-    do_apa();
+  document.getElementById("next").addEventListener("click", () => {
+    if (apa == undefined) reset_apa();
+    const ln = apa.next_inst().ln;
+    console.log(apa.next_inst());
+    mark_line(ln);
+    apa.step();
+  });
+
+  document.getElementById("reset").addEventListener("click", () => {
+    reset_apa();
   });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   main();
 });

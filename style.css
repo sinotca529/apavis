@@ -1,24 +1,36 @@
-@media all and (min-width: 500px) {
-  .columns {
-    display: flex;
-  }
-}
+/* @media all and (min-width: 500px) { */
+/*   .columns { */
+/*     display: flex; */
+/*     flex-direction: column; */
+/*   } */
+/* } */
 
 body {
   font-size: xx-large;
 }
 
-.column {
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  /* align-items: flex-end; */
-  justify-content: center;
+pre {
+  display: block;
+  font-size: xx-large;
+  resize: none;
+  width: 90%;
+  height: 50vh;
+  border: solid;
 }
 
-textarea {
-  /* display: inline-block; */
+.graph {
+  width: 90%;
+  height: 50vh;
+}
+
+.columns {
+  display: block flex;
+  flex-direction: row;
   width: 100%;
-  padding: 0.5em:
-  margin: 0.5em 0;
+}
+
+.column {
+  width: 100%;
+  display: block flex;
+  flex-direction: column;
 }

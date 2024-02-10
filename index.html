@@ -1,21 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <title>APA Vis</title>
-    <link rel="stylesheet", href="style.css">
+    <link rel="stylesheet" , href="style.css" />
     <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
     <div class="columns">
       <div class="column">
-        <button type="button" id="start">Start Analysis</button>
-        <textarea id="code" name="code"></textarea>
+        <pre contentEditable="True" id="code" name="code"></pre>
       </div>
       <div class="column">
-        <div id="graph" style="width: 100%"></div>
+        <div class="graph" id="graph" style="width: 100%"></div>
+        <div class="columns">
+          <div class="column">
+            <button type="button" id="reset">Reset</button>
+          </div>
+          <div class="column">
+            <button disabled type="button" id="before">&lt;</button>
+          </div>
+          <div class="column">
+            <button type="button" id="next">&gt;</button>
+          </div>
+        </div>
       </div>
+    </div>
+    <div>
+      Syntax:
+      <ul>
+        <li>[COPY] p = q</li>
+        <li>[LOAD] p = *q</li>
+        <li>[STORE] *p = q</li>
+        <li>[ADDR_OF] p = &a</li>
+      </ul>
     </div>
   </body>
 </html>
