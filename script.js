@@ -135,7 +135,6 @@ class CyGraph {
   }
 
   add_edge(dst, src, type) {
-    console.log(dst, src);
     this.#add_node(dst);
     this.#add_node(src);
     this.cy.add([
@@ -186,7 +185,6 @@ class Graph {
 
   eval_copy_edge(dst, src) {
     let updated = this.#add_edge(this.copy_edges, dst, src);
-    console.log(dst, src);
     this.cy.add_edge(dst, src, COPY);
     updated |= this.#copy_pointees(dst, src);
     return updated;
@@ -231,9 +229,7 @@ class Apa {
     this.insts = parse(code);
 
     const ns = num_symbols(this.insts);
-    console.log(ns);
     const grid_size = Math.ceil(Math.sqrt(ns));
-    console.log(grid_size);
 
     this.g = new Graph(grid_size);
     this.next_index = 0;
