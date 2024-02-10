@@ -10,7 +10,7 @@
   <body>
     <div class="columns">
       <div class="column">
-        <pre contentEditable="True" id="code" name="code"></pre>
+        <pre contenteditable="True" id="code" name="code"></pre>
       </div>
       <div class="column">
         <div class="graph" id="graph" style="width: 100%"></div>
@@ -28,13 +28,37 @@
       </div>
     </div>
     <div>
-      Syntax:
-      <ul>
-        <li>[COPY] p = q</li>
-        <li>[LOAD] p = *q</li>
-        <li>[STORE] *p = q</li>
-        <li>[ADDR_OF] p = &a</li>
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Kind</th>
+            <th scope="col">Syntax</th>
+            <th scope="col">Edge</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">COPY</th>
+            <td><pre>p = q</pre></td>
+            <td><pre>p &lt;----- q</pre></td>
+          </tr>
+          <tr>
+            <th scope="row">LOAD</th>
+            <td><pre>p = *q</pre></td>
+            <td><pre>p &lt;-----o q</pre></td>
+          </tr>
+          <tr>
+            <th scope="row">STORE</th>
+            <td><pre>*p = q</pre></td>
+            <td><pre>p o&lt;----- q</pre></td>
+          </tr>
+          <tr>
+            <th scope="row">ADDR_OF</th>
+            <td><pre>p = &a</pre></td>
+            <td><pre>p - - -&gt; a</pre></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </body>
 </html>

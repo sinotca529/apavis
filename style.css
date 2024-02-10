@@ -9,12 +9,13 @@ body {
   font-size: xx-large;
 }
 
-pre {
+pre#code {
   display: block;
   font-size: xx-large;
   resize: none;
   width: 90%;
-  height: 50vh;
+  min-height: 50vh;
+  height: fit-contents;
   border: solid;
 }
 
@@ -33,4 +34,28 @@ pre {
   width: 100%;
   display: block flex;
   flex-direction: column;
+}
+
+table {
+  border-collapse: collapse;
+  border: 2px solid rgb(140 140 140);
+  font-family: sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+caption {
+  caption-side: bottom;
+  padding: 10px;
+  font-weight: bold;
+}
+
+th,
+td {
+  border: 1px solid rgb(160 160 160);
+  padding: 8px 10px;
+}
+
+td:last-of-type {
+  text-align: center;
 }
